@@ -1,16 +1,33 @@
+//command design pattern
 import React, { useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { verify } from '../actions/auth';
 
+// Command
+class VerifyCommand {
+  constructor(verify, uid, token) {
+    this.verify = verify;
+    this.uid = uid;
+    this.token = token;
+  }
+
+  execute() {
+    return this.verify(this.uid, this.token);
+  }
+}
+
 function Activate({ verify }) {
   const [verified, setVerified] = useState(false);
   const { uid, token } = useParams();
 
-  const verify_account = e => {
+  const verify_account = (e) => {
     console.log(`uid: ${uid}, token: ${token}`);
 
-    verify(uid, token)
+    const command = new VerifyCommand(verify, uid, token);
+
+    command
+      .execute()
       .then(() => {
         setVerified(true);
       })

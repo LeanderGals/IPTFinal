@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Design Patterns Website</title>
+    <style>
+        /* Styles for the website */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .content {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Design Patterns Website</h1>
+    
+    <div class="content" id="content">
+        <button onclick="showMessage()">Click me!</button>
+    </div>
+    
+    <script>
+        // Singleton pattern
+        const Singleton = (function() {
+            let instance;
+            
+            function createInstance() {
+                return {
+                    showMessage: function() {
+                        const contentElement = document.getElementById('content');
+                        contentElement.innerHTML = 'Singleton pattern: Only one instance is created.';
+                    }
+                };
+            }
+            
+            return {
+                getInstance: function() {
+                    if (!instance) {
+                        instance = createInstance();
+                    }
+                    return instance;
+                }
+            };
+        })();
+        
+        // Factory pattern
+        function ButtonFactory() {
+            this.createButton = function(type) {
+                let button;
+                
+                if (type === 'submit') {
+                    button = new SubmitButton();
+                } else if (type === 'reset') {
+                    button = new ResetButton();
+                } else {
+                    throw new Error('Invalid button type');
+                }
+                
+                return button;
+            };
+        }
+        
+        function SubmitButton() {
+            this.render = function() {
+                const button = document.createElement('button');
+                button.innerHTML = 'Submit';
+                return button;
+            };
+        }
+        
+        function ResetButton() {
+            this.render = function() {
+                const button = document.createElement('button');
+                button.innerHTML = 'Reset';
+                return button;
+            };
+        }
+        
+        // Observer pattern
+        function Subject() {
+            this.observers = [];
+            
+            this.subscribe = function(observer) {
+                this.observers.push(observer);
+            };
+            
+            this.unsubscribe = function(observer) {
+                const index = this.observers.indexOf(observer);
+                if (index > -1) {
+                    this.observers.splice(index, 1);
+                }
+            };
+            
+            this.notify = function(message) {
+                this.observers.forEach(function(observer) {
+                    observer.update(message);
+                });
+            };
+        }
+        
+        function Observer() {
+            this.update = function(message) {
+                console.log('Received message: ' + message);
+            };
+        }
+        
+        // Strategy pattern
+        function Context(strategy) {
+            this.strategy = strategy;
+            
+            this.executeStrategy = function() {
+                return this.strategy();
+            };
+        }
+        
+        function strategyA() {
+            return 'Strategy A is executed.';
+        }
+        
+        function strategyB() {
+            return 'Strategy B is executed.';
+        }
+        
+        // Decorator pattern
+        function TextDecorator(textElement) {
+            this.textElement = textElement;
+            
+            this.decorate = function() {
+                this.textElement.innerHTML += ' (decorated)';
+            };
+        }
+        
+        function showMessage() {
+            const singletonInstance = Singleton.getInstance();
+            singletonInstance.showMessage();
+            
+            const factory = new ButtonFactory();
+            const submitButton = factory.createButton('submit');
+            const resetButton = factory.createButton('reset');
+            
+            const contentElement = document.getElementById('content');
+            contentElement.innerHTML += '<br><br>';
+            contentElement.appendChild(submitButton.render());
+            contentElement.appendChild(resetButton.render());
+            
+            const subject = new Subject();
+            const observer1 = new Observer();
+            const observer2 = new Observer();
+            
+            subject.subscribe(observer1);
+            subject.subscribe(observer2);
+            
+            subject.notify('Observer pattern: Hello observers!');
+            
+            const contextA = new Context(strategyA);
+            const contextB = new Context(strategyB);
+            
+            contentElement.innerHTML += '<br><br>';
+            contentElement.innerHTML += contextA.executeStrategy();
+            contentElement.innerHTML += '<br>';
+            contentElement.innerHTML += contextB.executeStrategy();
+            
+            const textElement = document.createElement('p');
+            textElement.innerHTML = 'Decorator pattern';
+            
+            const decorator = new TextDecorator(textElement);
+            decorator.decorate();
+            
+            contentElement.appendChild(textElement);
+        }
+    </script>
+</body>
+</html>
